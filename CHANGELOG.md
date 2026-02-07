@@ -1,5 +1,88 @@
 # 🎉 CHANGELOG - What's New!
 
+## Version 1.2.0 - Major UI Fixes & All Formats Support! 🎨📺
+
+### CRITICAL FIXES:
+✅ **Add Playlist NOW WORKS** - Dialog properly implemented  
+✅ **Settings NOW WORKS** - Opens settings activity  
+✅ **ALL FORMATS SUPPORTED** - Not just M3U8 anymore!  
+✅ **Channel Logos Display** - Glide image loader integrated  
+✅ **Category Grouping** - Auto-organized by M3U groups  
+✅ **TiviMate-Style UI** - Professional design  
+
+### What's Fixed:
+
+#### UI Issues (All Resolved!):
+- ✅ **Add Playlist dialog functional** - Was completely broken
+- ✅ **Settings activity opens** - Was not implemented
+- ✅ **Channel cards show logos** - Glide integration
+- ✅ **Categories auto-group** - From M3U group-title
+- ✅ **Favorites row works** - Proper filtering
+- ✅ **Better error messages** - User-friendly
+
+#### Format Support (MASSIVE Upgrade!):
+- ✅ **HLS** (.m3u8) - Was already working
+- ✅ **RTSP** (rtsp://) - NOW ADDED
+- ✅ **HTTP/HTTPS** (.ts, .mp4, .mkv) - NOW ADDED
+- ✅ **DASH** (.mpd) - NOW ADDED
+- ✅ **SmoothStreaming** - NOW ADDED
+- ✅ **UDP Multicast** - NOW ADDED
+
+#### Player Improvements:
+- ✅ **Auto-format detection** - No manual config
+- ✅ **Better buffering** - Configurable
+- ✅ **Hardware acceleration** - GPU decoding
+- ✅ **Error recovery** - Auto-retry
+- ✅ **All codecs** - H.264, H.265, VP8, VP9, AV1
+
+### Files Modified:
+
+1. **MainActivity.kt** - Complete rewrite
+   - Working dialogs
+   - Category grouping
+   - Glide image loading
+   - Proper LiveData observation
+   - Error handling
+
+2. **PlayerActivity.kt** - Format support
+   - Universal playback engine
+   - All ExoPlayer extensions
+   - Better error messages
+
+3. **app/build.gradle** - Dependencies
+   - Added Glide
+   - All ExoPlayer modules
+   - Proper annotation processors
+
+### New Documentation:
+- **SUPPORTED_FORMATS.md** - Complete format guide
+- **UI_FIXES_v1.2.0.md** - What's been fixed
+
+### Technical Details:
+
+**Dependencies Added:**
+```gradle
+implementation 'com.github.bumptech.glide:glide:4.16.0'
+implementation 'exoplayer-core'
+implementation 'exoplayer-hls'
+implementation 'exoplayer-dash'
+implementation 'exoplayer-rtsp'
+implementation 'exoplayer-smoothstreaming'
+implementation 'exoplayer-ui'
+```
+
+**Format Support Matrix:**
+| Format | Before | After |
+|--------|--------|-------|
+| HLS | ✅ | ✅ |
+| RTSP | ❌ | ✅ |
+| HTTP | ❌ | ✅ |
+| DASH | ❌ | ✅ |
+| SmoothStreaming | ❌ | ✅ |
+| UDP | ❌ | ✅ |
+
+---
+
 ## Version 1.1.0 - Number Pad Feature Added! 🔢
 
 ### NEW FEATURE: Direct Channel Access via Number Pad
