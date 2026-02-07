@@ -21,12 +21,24 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    # --- KEY FIX: Force install of Gradle 8.3 ---
+    # --- SETUP GRADLE 8.3 ---
+    # This ensures we use a compatible Gradle version (fixes the 9.3.1 error)
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
       with:
         gradle-version: 8.3
-        
+
+    # --- FIX REPOSITORY CONFLICT ---
+    # This forces settings.gradle to accept repositories defined in build.gradle
+    # It replaces "FAIL_ON_PROJECT_REPOS" or "PREFER_SETTINGS" with "PREFER_PROJECT"
+    - name: Fix Gradle Settings
+      run: |
+        if [ -f settings.gradle ]; then
+          sed -i 's/FAIL_ON_PROJECT_REPOS/PREFER_PROJECT/g' settings.gradle
+          sed -i 's/PREFER_SETTINGS/PREFER_PROJECT/g' settings.gradle
+          echo "Patched settings.gradle to allow project repositories."
+        fi
+
     - name: Build Debug APK
       run: gradle assembleDebug --stacktrace --no-daemon
       
