@@ -22,22 +22,26 @@ jobs:
         distribution: 'temurin'
 
     # --- SETUP GRADLE 8.3 ---
-    # This ensures we use a compatible Gradle version (fixes the 9.3.1 error)
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v4
+      uses: gradle/actions/setup-gradle@v3
       with:
         gradle-version: 8.3
 
-    # --- FIX REPOSITORY CONFLICT ---
-    # This forces settings.gradle to accept repositories defined in build.gradle
-    # It replaces "FAIL_ON_PROJECT_REPOS" or "PREFER_SETTINGS" with "PREFER_PROJECT"
+    # --- FIX 1: REPOSITORY CONFLICT ---
     - name: Fix Gradle Settings
       run: |
         if [ -f settings.gradle ]; then
-          sed -i 's/FAIL_ON_PROJECT_REPOS/PREFER_PROJECT/g' settings.gradle
-          sed -i 's/PREFER_SETTINGS/PREFER_PROJECT/g' settings.gradle
-          echo "Patched settings.gradle to allow project repositories."
+          sed -i 's/FAIL_ON_PROJECT_REPOS/PREFER_PROJECT/g' settings.gradle || true
+          sed -i 's/PREFER_SETTINGS/PREFER_PROJECT/g' settings.gradle || true
         fi
+        
+    # --- FIX 2: MOVE ADAPTIVE ICONS ---
+    # Moves XML icons from density folders to v26 folder to fix the "requires sdk 26" error
+    - name: Fix Icon Location
+      run: |
+        mkdir -p app/src/main/res/mipmap-anydpi-v26
+        find app/src/main/res/mipmap-* -name "ic_launcher.xml" -exec mv {} app/src/main/res/mipmap-anydpi-v26/ \;
+        echo "Moved adaptive icons to v26 folder."
 
     - name: Build Debug APK
       run: gradle assembleDebug --stacktrace --no-daemon
