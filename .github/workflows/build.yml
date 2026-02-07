@@ -10,41 +10,22 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
+    
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-
+      
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
-
-    # --- SETUP GRADLE 8.3 ---
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v3
-      with:
-        gradle-version: 8.3
-
-    # --- FIX 1: REPOSITORY CONFLICT ---
-    - name: Fix Gradle Settings
-      run: |
-        if [ -f settings.gradle ]; then
-          sed -i 's/FAIL_ON_PROJECT_REPOS/PREFER_PROJECT/g' settings.gradle || true
-          sed -i 's/PREFER_SETTINGS/PREFER_PROJECT/g' settings.gradle || true
-        fi
         
-    # --- FIX 2: MOVE ADAPTIVE ICONS ---
-    # Moves XML icons from density folders to v26 folder to fix the "requires sdk 26" error
-    - name: Fix Icon Location
-      run: |
-        mkdir -p app/src/main/res/mipmap-anydpi-v26
-        find app/src/main/res/mipmap-* -name "ic_launcher.xml" -exec mv {} app/src/main/res/mipmap-anydpi-v26/ \;
-        echo "Moved adaptive icons to v26 folder."
-
+    - name: Make gradlew executable
+      run: chmod +x gradlew
+        
     - name: Build Debug APK
-      run: gradle assembleDebug --stacktrace --no-daemon
+      run: ./gradlew assembleDebug --stacktrace --no-daemon
       
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4
@@ -54,7 +35,7 @@ jobs:
         retention-days: 30
         
     - name: Build Release APK (unsigned)
-      run: gradle assembleRelease --stacktrace --no-daemon
+      run: ./gradlew assembleRelease --stacktrace --no-daemon
       continue-on-error: true
       
     - name: Upload Release APK
@@ -64,4 +45,3 @@ jobs:
         name: iptv-player-release-unsigned
         path: app/build/outputs/apk/release/app-release-unsigned.apk
         retention-days: 30
-        
