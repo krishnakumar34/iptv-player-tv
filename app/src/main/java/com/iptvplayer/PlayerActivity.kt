@@ -69,7 +69,11 @@ class PlayerActivity : AppCompatActivity() {
     }
 
     private fun setupPlayer() {
-        player = ExoPlayer.Builder(this).build().also { exoPlayer ->
+        player = ExoPlayer.Builder(this)
+            .setSeekBackIncrementMs(10000)
+            .setSeekForwardIncrementMs(10000)
+            .build()
+            .also { exoPlayer ->
             playerView.player = exoPlayer
             
             exoPlayer.addListener(object : Player.Listener {
@@ -96,25 +100,8 @@ class PlayerActivity : AppCompatActivity() {
                 }
             })
 
-            val dataSourceFactory = DefaultHttpDataSource.Factory()
-                .setUserAgent("IPTV-Player/1.0")
-                .setAllowCrossProtocolRedirects(true)
-
-            val mediaSource = when {
-                channelUrl.contains(".m3u8") -> {
-                    HlsMediaSource.Factory(dataSourceFactory)
-                        .createMediaSource(MediaItem.fromUri(channelUrl))
-                }
-                else -> {
-                    val mediaItem = MediaItem.fromUri(channelUrl)
-                    exoPlayer.prepare()
-                    return@also
-                }
-            }
-
-            exoPlayer.setMediaSource(mediaSource)
-            exoPlayer.prepare()
-            exoPlayer.playWhenReady = true
+            // Play the channel
+            playChannel(channelUrl)
         }
 
         // Hide system UI for immersive experience
@@ -267,26 +254,26 @@ class PlayerActivity : AppCompatActivity() {
         val dataSourceFactory = DefaultHttpDataSource.Factory()
             .setUserAgent("IPTV-Player/1.0")
             .setAllowCrossProtocolRedirects(true)
+            .setConnectTimeoutMs(30000)
+            .setReadTimeoutMs(30000)
 
-        val mediaSource = when {
-            url.contains(".m3u8") -> {
-                HlsMediaSource.Factory(dataSourceFactory)
-                    .createMediaSource(MediaItem.fromUri(url))
-            }
-            else -> {
-                null
-            }
-        }
+        // Determine media type and create appropriate source
+        val mediaItem = MediaItem.Builder()
+            .setUri(url)
+            .build()
 
-        mediaSource?.let {
-            player?.setMediaSource(it)
-            player?.prepare()
-            player?.playWhenReady = true
-        } ?: run {
-            val mediaItem = MediaItem.fromUri(url)
-            player?.setMediaItem(mediaItem)
-            player?.prepare()
-            player?.playWhenReady = true
+        // ExoPlayer automatically handles:
+        // - HLS (.m3u8)
+        // - DASH (.mpd)
+        // - SmoothStreaming
+        // - Progressive (HTTP/HTTPS)
+        // - RTSP
+        // - RTMP (with extension)
+        
+        player?.apply {
+            setMediaItem(mediaItem)
+            prepare()
+            playWhenReady = true
         }
     }
 
